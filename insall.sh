@@ -42,8 +42,8 @@ progress_bar() {
 
 clear
 echo "=============================================="
-echo "    Dream_Stream Installation Script"
-echo "          Dream_Stream V1.0"
+echo "    Union_Stream Installation Script"
+echo "          Union_Stream V4.0"
 echo "=============================================="
 echo ""
 
@@ -58,7 +58,7 @@ fi
 
 # التنزيل
 print_status "Downloading Dream_Stream from GitHub..."
-wget -O /tmp/Dream_Stream.tar.gz https://github.com/Said-Pro/StalkerOS/raw/refs/heads/main/Dream_Stream.tar.gz
+wget -O /tmp/Union_Stream.tar.gz https://github.com/Said-Pro/StalkerOS/raw/refs/heads/main/Union_Stream.tar.gz
 
 if [ $? -eq 0 ]; then
     print_success "Download completed successfully"
@@ -70,7 +70,7 @@ fi
 # فك الضغط
 print_status "Extracting files to plugins directory..."
 cd /tmp/
-tar -xzf Dream_Stream.tar.gz -C /usr/lib/enigma2/python/Plugins/Extensions
+tar -xzf Union_Stream.tar.gz -C /usr/lib/enigma2/python/Plugins/Extensions
 
 if [ $? -eq 0 ]; then
     print_success "Extraction completed successfully"
@@ -81,7 +81,7 @@ fi
 
 # تنظيف الملف المؤقت
 print_status "Cleaning temporary files..."
-rm -f /tmp/Dream_Stream.tar.gz
+rm -f /tmp/Union_Stream.tar.gz
 print_success "Temporary files removed"
 
 # تثبيت الحزم المطلوبة
