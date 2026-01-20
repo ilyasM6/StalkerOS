@@ -57,7 +57,7 @@ else
 fi
 
 # التنزيل
-print_status "Downloading Dream_Stream from GitHub..."
+print_status "Downloading Unnion_Stream from GitHub..."
 wget -O /tmp/Union_Stream.tar.gz https://github.com/Said-Pro/StalkerOS/raw/refs/heads/main/Union_Stream.tar.gz
 
 if [ $? -eq 0 ]; then
