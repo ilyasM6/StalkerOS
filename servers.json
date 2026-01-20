@@ -1,0 +1,36 @@
+{
+  "servers": [
+    {
+      "name": "line.stayconnected",
+      "host": "http://line.stayconnected.pro/c/",
+      "mac": "00:1A:79:BB:AB:76",
+      "type": "stalker",
+      "active": true,
+      "id": "stayconnected",
+      "created": "2026-01-13T08:06:23.930259",
+      "tested": true,
+      "test_result": "Connecté - Token: 58048CD2B992862...",
+      "last_used": "2026-01-14T00:14:55.700328"
+    },
+    {
+      "id": "diablo",
+      "type": "xtream",
+      "name": "diablo-pro",
+      "host": "http://diablo-pro.com:2095",
+      "username": "1234567",
+      "password": "7654321",
+      "active": false,
+      "timeout": 30,
+      "tested": true,
+      "test_result": "Erreur: ('Connection aborted.', ConnectionResetError(104, ",
+      "options": {},
+      "created": "2026-01-07T04:54:40.643804",
+      "last_used": "2026-01-14T00:14:40.553202",
+      "last_test": "2026-01-07T23:29:31.606722"
+    }  ],
+  "metadata": {
+    "last_modified": "2026-01-14T00:14:55.975881",
+    "total_servers": 9,
+    "version": "2.0"
+  }
+}
