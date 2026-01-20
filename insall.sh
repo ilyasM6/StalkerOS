@@ -106,19 +106,38 @@ if [ $? -eq 0 ]; then
     
     # التحقق من صحة الملف
     if [ -s /tmp/servers.json ]; then
-        # نسخ الملف إلى المسار النهائي
-        cp /tmp/servers.json /etc/enigma2/Union_Stream/servers.json
-        
-        # تعيين الصلاحيات المناسبة
-        chmod 644 /etc/enigma2/Union_Stream/servers.json
-        chown root:root /etc/enigma2/Union_Stream/servers.json
-        
-        print_success "servers.json copied to /etc/enigma2/Union_Stream/"
-        print_success "File permissions set correctly"
-        
-        # تنظيف الملف المؤقت
-        rm -f /tmp/servers.json
-        
+        # التحقق من أن الملف يحتوي على JSON صالح
+        if python3 -m json.tool /tmp/servers.json >/dev/null 2>&1; then
+            # نسخ الملف إلى المسار النهائي
+            cp /tmp/servers.json /etc/enigma2/Union_Stream/servers.json
+            
+            # تعيين الصلاحيات المناسبة
+            chmod 644 /etc/enigma2/Union_Stream/servers.json
+            chown root:root /etc/enigma2/Union_Stream/servers.json
+            
+            print_success "servers.json copied to /etc/enigma2/Union_Stream/"
+            print_success "File permissions set correctly"
+            
+            # عرض حجم الملف
+            file_size=$(stat -c%s "/etc/enigma2/Union_Stream/servers.json")
+            echo -e "${GREEN}[✓]${NC} File size: $(($file_size/1024)) KB"
+            
+            # تنظيف الملف المؤقت
+            rm -f /tmp/servers.json
+            
+        else
+            print_error "servers.json is not valid JSON!"
+            
+            # إذا كان هناك نسخة احتياطية، استرجعها
+            if ls /etc/enigma2/Union_Stream/servers.json.backup_* 2>/dev/null | head -1; then
+                latest_backup=$(ls -t /etc/enigma2/Union_Stream/servers.json.backup_* | head -1)
+                cp "$latest_backup" /etc/enigma2/Union_Stream/servers.json
+                print_warning "Restored servers.json from backup"
+            fi
+            
+            rm -f /tmp/servers.json
+            exit 1
+        fi
     else
         print_error "servers.json is empty!"
         rm -f /tmp/servers.json
@@ -180,86 +199,22 @@ else
     fi
 fi
 
-# إعادة التشغيل - الجزء المهم
+# إعادة التشغيل
 print_status "Restarting Enigma2..."
 print_warning "Please wait while the system restarts..."
-progress_bar 5
+progress_bar 3
 
-# محاولات متعددة لإعادة التشغيل
-restart_success=false
+systemctl restart enigma2
 
-# الطريقة الأولى: systemctl
-if command -v systemctl >/dev/null 2>&1; then
-    print_status "Using systemctl to restart Enigma2..."
-    systemctl restart enigma2
-    if [ $? -eq 0 ]; then
-        restart_success=true
-        print_success "Enigma2 restart command sent successfully"
-    fi
-fi
-
-# الطريقة الثانية: init.d
-if [ "$restart_success" = false ] && [ -f "/etc/init.d/enigma2" ]; then
-    print_status "Using init.d script to restart Enigma2..."
-    /etc/init.d/enigma2 restart
-    if [ $? -eq 0 ]; then
-        restart_success=true
-        print_success "Enigma2 restart command sent successfully"
-    fi
-fi
-
-# الطريقة الثالثة: kill وبدء جديد
-if [ "$restart_success" = false ]; then
-    print_status "Using kill method to restart Enigma2..."
-    killall -9 enigma2 2>/dev/null
-    /usr/bin/enigma2.sh &
-    if [ $? -eq 0 ]; then
-        restart_success=true
-        print_success "Enigma2 restart command sent successfully"
-    fi
-fi
-
-if [ "$restart_success" = true ]; then
-    echo ""
-    echo "=============================================="
-    print_success "Installation completed successfully!"
-    print_success "Union_Stream has been installed and activated"
-    print_success "servers.json has been configured"
-    print_success "Enigma2 is restarting..."
-    echo "=============================================="
-    echo ""
-    echo "Summary:"
-    echo "- Plugin installed to: /usr/lib/enigma2/python/Plugins/Extensions"
-    echo "- Configuration file: /etc/enigma2/Union_Stream/servers.json"
-    
-    if [ -f "/etc/enigma2/Union_Stream/servers.json.backup_"* ]; then
-        echo "- Backup created: /etc/enigma2/Union_Stream/servers.json.backup_*"
-    fi
-    
-    echo ""
-    echo "Please wait for Enigma2 to fully restart..."
-    echo "This may take 30-60 seconds..."
-    
-    # عرض مؤشر تقدم للانتظار
-    print_status "Waiting for Enigma2 to fully restart..."
-    for i in {1..10}; do
-        echo -ne "${BLUE}Waiting... $(($i*10)) seconds${NC}\r"
-        sleep 10
-    done
-    echo ""
-    
-else
-    echo ""
-    echo "=============================================="
-    print_warning "Installation completed with restart warning!"
-    print_success "Union_Stream has been installed and activated"
-    print_success "servers.json has been configured"
-    print_warning "Could not automatically restart Enigma2"
-    echo "=============================================="
-    echo ""
-    echo "Please restart Enigma2 manually to complete installation:"
-    echo "1. Restart from the receiver menu, OR"
-    echo "2. Run: systemctl restart enigma2, OR"
-    echo "3. Run: /etc/init.d/enigma2 restart"
-    echo ""
-fi
+echo ""
+echo "=============================================="
+print_success "Installation completed successfully!"
+print_success "Union_Stream has been installed and activated"
+print_success "servers.json has been configured"
+echo "=============================================="
+echo ""
+echo "Summary:"
+echo "- Plugin installed to: /usr/lib/enigma2/python/Plugins/Extensions"
+echo "- Configuration file: /etc/enigma2/Union_Stream/servers.json"
+echo "- Backup created: /etc/enigma2/Union_Stream/servers.json.backup_*"
+echo ""
