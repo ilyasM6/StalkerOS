@@ -107,6 +107,6 @@ systemctl restart enigma2
 echo ""
 echo "=============================================="
 print_success "Installation completed successfully!"
-print_success "Dream_Stream has been installed and activated"
+print_success "Union_Stream has been installed and activated"
 echo "=============================================="
 echo ""
